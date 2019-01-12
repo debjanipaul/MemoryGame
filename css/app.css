@@ -115,11 +115,13 @@ h1 {
 }
 
 .score-panel .timer {
-  padding-left: 15px;
+  display: inline-block;
+  margin: 0 10px 0 0;
+  float: right;
 }
 
 .container  .popupModal {
-  border: 5px solid #990000;
+  border: 5px solid #ff6600;
   border-radius: 15px;
   width: 40%;
   position:fixed;

@@ -22,6 +22,12 @@ let timer = document.querySelector('.timer');
 let totalSeconds = 0;
 
 
+function startGame(){
+  generateCards();
+  // Start the timer when game loads
+  timeInt = setInterval(countTimer, 1000);
+}
+
 
 // Shuffle function from http://stackoverflow.com/a/2450976
 function shuffle(array) {
@@ -42,6 +48,7 @@ function shuffle(array) {
  * Generating cards for the game dynamically
  */
 function generateCards(){
+
   //Shuffle cards array
   shuffle(cardList);
 
@@ -68,21 +75,16 @@ function clickCards(card){
           const previousCard = openCards[0];
 
           if(openCards.length === 1){
-              card.classList.add("open", "show", "wiggle");
+
+              card.classList.add("open", "show", "disable", "wiggle");
               openCards.push(this);
               //Compare two cards
               compareCards(currentCard, previousCard);
               //Add number of moves
               addMoves();
 
-                // Start the timer if it is the first click
-                if (cardMoves === 1) {
-                    timeInt = setInterval(countTimer, 1000);
-                  }
-
-
           } else {
-              card.classList.add("open", "show", "wiggle");
+              card.classList.add("open", "show", "disable", "wiggle");
               openCards.push(this);
           }
   });
@@ -94,8 +96,8 @@ function clickCards(card){
  */
  function compareCards(currentCard, previousCard){
         if(currentCard.innerHTML === previousCard.innerHTML){
-              currentCard.classList.add("match", "disable");
-              previousCard.classList.add("match", "disable");
+              currentCard.classList.add("match");
+              previousCard.classList.add("match");
 
               matchedCards.push(currentCard, previousCard);
               openCards = [];
@@ -105,10 +107,10 @@ function clickCards(card){
 
         } else {
               setTimeout(function(){
-                  currentCard.classList.remove("open", "show");
-                  previousCard.classList.remove("open", "show");
-                  openCards = [];
+                  currentCard.classList.remove("open", "show", "disable");
+                  previousCard.classList.remove("open", "show", "disable");
                 }, 500);
+                  openCards = [];
             }
  }
 
@@ -124,7 +126,7 @@ function addMoves(){
 
 
 /*
- *Star rating syatem
+ *Star rating system
  */
 function starRating(){
       if(cardMoves <= 17){
@@ -147,14 +149,14 @@ function starRating(){
    let hour = Math.floor(totalSeconds/3600);
    let minute = Math.floor((totalSeconds - hour*3600)/60);
    let seconds = totalSeconds - (hour*3600 + minute*60);
-   timer.innerHTML = `${minute}mins : ${seconds}secs`;
+   timer.innerHTML = ('0'  + minute).slice(-2)+':'+('0' + seconds).slice(-2);
  }
 
  // Reset the timer to default of 0 and the text on the webpage to 00:00
  function resetTimer(){
      clearInterval(timeInt);
      totalSeconds = 0;
-     timer.innerHTML = `00mins : 00secs`;
+     timer.innerHTML = `00:00`;
  }
 
  // Stop the timer
@@ -169,7 +171,10 @@ function starRating(){
 function gameOver(){
       if(cardList.length === matchedCards.length){
           stopTimer();
-          displayPopup();
+          //Display popup modal after 1sec delay so that all the card moves are completed
+          setTimeout(function(){
+            return displayPopup();
+          }, 1000);
         }
 }
 
@@ -180,12 +185,15 @@ function reset(){
   ul.innerHTML = "";
   moves.innerHTML = 0;
   generateCards();
+  openCards = [];
   matchedCards = [];
   cardMoves = 0;
   stars.innerHTML = `<li><i class="fa fa-star"></i></li>
                     <li><i class="fa fa-star"></i></li>
                     <li><i class="fa fa-star"></i></li>`;
   resetTimer();
+  //Start timer
+  timeInt = setInterval(countTimer, 1000);
   popupHide();
 }
 
@@ -209,7 +217,7 @@ function buildPopup(){
 }
 buildPopup();
 
-//Displaying popup after gameOver
+//Display popup after gameOver
 function displayPopup(){
     const popup = document.querySelector('.popupModal');
     popup.className = 'popupModal';
@@ -223,7 +231,7 @@ function displayPopup(){
         play.addEventListener('click', reset);
 }
 
-//Hiding the popup modal
+//Hide the popup modal
 function popupHide() {
   let popupModal = document.querySelector('.popupModal');
     popupModal.className = ('popupModal hide');
@@ -231,8 +239,12 @@ function popupHide() {
 }
 
 
-//Starts the game for the first time
-generateCards();
+
+/*
+ * Start the game for the first time
+ */
+startGame();
+
 
 /*
  * Display the cards on the page
